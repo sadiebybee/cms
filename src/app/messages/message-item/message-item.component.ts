@@ -2,8 +2,6 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'cms-message-item',
-  standalone: true,
-  imports: [],
   templateUrl: './message-item.component.html',
   styleUrl: './message-item.component.css'
 })
