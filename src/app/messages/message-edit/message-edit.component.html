@@ -1,6 +1,6 @@
 <div class="panel panel-default">
 <div class="panel-body">
-<form id="document-edit">
+<form id="document-edit" (submit)="$event.preventDefault()">
 <div class="row">
 <div class="col-sm-12 form-group">
 <label for="subject">Subject</label>
@@ -9,7 +9,9 @@ type="text"
 id="subject"
 class="form-control"
 size="120"
-max="120">
+max="120"
+#subjectInput
+>
 </div>
 
 <div class="col-sm-12 form-group">
@@ -19,13 +21,15 @@ type="text"
 id="message"
 class="form-control"
 max="255"
-size="120">
+size="120"
+#msgTextInput
+>
 </div>
 </div>
 <div class="row">
 <div class="col-xs-12">
-<button class="btn btn-success" type="submit">Send</button>
-<button class="btn btn-danger" type="button">Clear</button>
+<button class="btn btn-success" type="button" (click)="onSendMessage()">Send</button>
+<button class="btn btn-danger" type="button" (click)="onClear()">Clear</button>
 </div>
 </div>
 </form>
