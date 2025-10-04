@@ -24,7 +24,6 @@ export class MessageEditComponent {
     const newMessage = new Message('1', subject, msgText, this.currentSender);
 
     this.addMessageEvent.emit(newMessage);
-    this.onClear();
   }
 
   onClear() {
