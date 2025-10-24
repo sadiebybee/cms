@@ -26,6 +26,8 @@ import { MessageEditComponent } from './messages/message-edit/message-edit.compo
 // Shared Directives
 import { DropdownDirective } from './shared/dropdown.directive';
 
+import { AppRoutingModule } from './app-routing.module';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -43,12 +45,8 @@ import { DropdownDirective } from './shared/dropdown.directive';
     MessageEditComponent,
     DropdownDirective,
   ],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    HttpClientModule
-  ],
+  imports: [BrowserModule, FormsModule, HttpClientModule, AppRoutingModule],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {}

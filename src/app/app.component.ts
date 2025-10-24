@@ -4,10 +4,4 @@ import { Component } from '@angular/core';
   selector: 'cms-root',
   templateUrl: './app.component.html',
 })
-export class AppComponent {
-  selectedFeature: string = 'documents';
-
-  switchView(selectedFeature: string) {
-    this.selectedFeature = selectedFeature;
-  }
-}
+export class AppComponent { }
