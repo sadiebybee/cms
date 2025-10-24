@@ -8,13 +8,13 @@ import { Contact } from '../../contacts/contact.model';
   templateUrl: './message-item.component.html',
 })
 export class MessageItemComponent implements OnInit {
-  @Input() message!: Message; // input message
-  messageSender: string = ''; // string to display sender's name
+  @Input() message!: Message;
+  messageSender: string = '';
 
   constructor(private contactService: ContactService) {}
 
   ngOnInit(): void {
     const contact: Contact | null = this.contactService.getContact(this.message.sender);
-    this.messageSender = contact ? contact.name : 'Unknown';
+    this.messageSender = contact ? contact.name : 'Sadie Bybee';
   }
 }
