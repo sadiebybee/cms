@@ -1,6 +1,6 @@
-<a class="list-group-item clearfix documentDiv">
-  <!-- Display document name here -->
-  <a href="#" class="list-group-item clearfix">
-    <span class="pull-left">{{ document.name }}</span>
-  </a>
+<a
+  class="list-group-item clearfix documentDiv"
+  [routerLink]="['/documents', document.id]"
+>
+  <span class="pull-left">{{ document.name }}</span>
 </a>

@@ -17,6 +17,7 @@ import { DocumentsComponent } from './documents/documents.component';
 import { DocumentListComponent } from './documents/document-list/document-list.component';
 import { DocumentItemComponent } from './documents/document-item/document-item.component';
 import { DocumentDetailComponent } from './documents/document-detail/document-detail.component';
+import { DocumentEditComponent } from './documents/document-edit/document-edit.component';
 
 // Messages Components
 import { MessageListComponent } from './messages/message-list/message-list.component';
@@ -40,6 +41,7 @@ import { AppRoutingModule } from './app-routing.module';
     DocumentListComponent,
     DocumentItemComponent,
     DocumentDetailComponent,
+    DocumentEditComponent,
     MessageListComponent,
     MessageItemComponent,
     MessageEditComponent,
