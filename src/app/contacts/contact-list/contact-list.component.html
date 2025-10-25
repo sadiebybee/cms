@@ -1,13 +1,16 @@
 <div class="panel panel-default">
   <div class="panel-heading clearfix">
     <h3 class="panel-title pull-left">Contacts</h3>
-    <button class="btn btn-success pull-right">New Contact</button>
+    <button class="btn btn-success pull-right" [routerLink]="['/contacts', 'new']">
+      New Contact
+    </button>
   </div>
   <div class="row">
     <div class="col-xs-12" *ngFor="let contact of contacts">
       <cms-contact-item
         [contact]="contact"
-        (click)="onSelected(contact)">
+        [routerLink]="['/contacts', contact.id]"
+        routerLinkActive="active">
       </cms-contact-item>
     </div>
   </div>
