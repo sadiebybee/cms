@@ -13,7 +13,7 @@ export class DocumentDetailComponent implements OnInit {
 
   constructor(
     private documentService: DocumentService,
-    private route: ActivatedRoute
+    public route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
