@@ -45,8 +45,8 @@ export class DocumentService {
   addDocument(newDocument: Document) {
     if (!newDocument) return;
 
-    this.maxDocumentId++; // increment the max ID
-    newDocument.id = this.maxDocumentId.toString(); // assign new unique ID
+    this.maxDocumentId++;
+    newDocument.id = this.maxDocumentId.toString();
     this.documents.push(newDocument);
     this.sortAndSend();
   }
