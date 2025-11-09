@@ -11,7 +11,7 @@ import { ContactService } from '../contact.service';
 })
 export class ContactEditComponent implements OnInit {
   originalContact: Contact | null = null;
-  contact: Contact = new Contact('', '', '', '', '', null);
+  contact: Contact = new Contact('', '', '', '', '', []);
   editMode: boolean = false;
 
   constructor(
