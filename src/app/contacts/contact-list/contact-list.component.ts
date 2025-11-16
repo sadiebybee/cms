@@ -6,6 +6,7 @@ import { ContactService } from '../contact.service';
 @Component({
   selector: 'cms-contact-list',
   templateUrl: './contact-list.component.html',
+  styleUrls: ['./contact-list.component.css'],
 })
 export class ContactListComponent implements OnInit, OnDestroy {
   contacts: Contact[] = [];
@@ -16,8 +17,10 @@ export class ContactListComponent implements OnInit, OnDestroy {
   constructor(private contactService: ContactService) {}
 
   ngOnInit(): void {
-    this.contacts = this.contactService.getContacts();
+    // Fetch contacts from Firebase
+    this.contactService.getContacts();
 
+    // Subscribe to changes in the contact list
     this.subscription = this.contactService.contactListChangedEvent.subscribe(
       (contactsList: Contact[]) => {
         this.contacts = contactsList;
