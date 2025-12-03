@@ -11,82 +11,101 @@ export class DocumentService {
   documentSelectedEvent = new Subject<Document>();
   documentListChangedEvent = new Subject<Document[]>();
 
-  private maxDocumentId: number = 0;
-
-  private firebaseUrl =
-    'https://sadiebybee-cms-default-rtdb.firebaseio.com/documents.json';
+  private documentsUrl = 'http://localhost:3000/documents';
 
   constructor(private http: HttpClient) {}
 
-  // Fetch from Firebase
+  // GET all documents from NodeJS server
   getDocuments() {
-    this.http.get<Document[]>(this.firebaseUrl).subscribe(
-      (documents: Document[]) => {
-        this.documents = documents || [];
-        this.maxDocumentId = this.getMaxId();
-        this.sortAndSend();
-      },
-      (error: any) => {
-        console.error('Error fetching documents from Firebase:', error);
-      }
-    );
+    this.http.get<{ message: string; documents: Document[] }>(this.documentsUrl)
+      .subscribe(
+        (response) => {
+          this.documents = response.documents || [];
+          this.sortAndSend();
+        },
+        (error) => {
+          console.error('Error fetching documents from server:', error);
+        }
+      );
   }
 
-  // Save Documents from Firebase
-  storeDocuments() {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    this.http
-      .put(this.firebaseUrl, this.documents, { headers })
-      .subscribe(() => {
-        this.sortAndSend();
-      });
-  }
-
+  // GET a single document by id
   getDocument(id: string): Document | null {
     return this.documents.find((doc) => doc.id === id) || null;
   }
 
+  // POST a new document
   addDocument(newDocument: Document) {
     if (!newDocument) return;
-    this.maxDocumentId++;
-    newDocument.id = this.maxDocumentId.toString();
-    this.documents.push(newDocument);
-    this.storeDocuments();
+
+    newDocument.id = ''; // let the server assign the id
+
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    this.http.post<{ message: string; document: Document }>(
+      this.documentsUrl,
+      newDocument,
+      { headers }
+    ).subscribe(
+      (response) => {
+        this.documents.push(response.document);
+        this.sortAndSend();
+      },
+      (error) => {
+        console.error('Error adding document:', error);
+      }
+    );
   }
 
+  // PUT: update an existing document
   updateDocument(originalDocument: Document, newDocument: Document) {
     if (!originalDocument || !newDocument) return;
-    const pos = this.documents.indexOf(originalDocument);
+
+    const pos = this.documents.findIndex(d => d.id === originalDocument.id);
     if (pos < 0) return;
+
     newDocument.id = originalDocument.id;
-    this.documents[pos] = newDocument;
-    this.storeDocuments();
+    newDocument._id = (originalDocument as any)._id;
+
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    this.http.put(
+      `${this.documentsUrl}/${originalDocument.id}`,
+      newDocument,
+      { headers }
+    ).subscribe(
+      () => {
+        this.documents[pos] = newDocument;
+        this.sortAndSend();
+      },
+      (error) => {
+        console.error('Error updating document:', error);
+      }
+    );
   }
 
+  // DELETE a document
   deleteDocument(document: Document | null) {
     if (!document) return;
-    const pos = this.documents.indexOf(document);
+
+    const pos = this.documents.findIndex(d => d.id === document.id);
     if (pos < 0) return;
-    this.documents.splice(pos, 1);
-    this.storeDocuments();
+
+    this.http.delete(`${this.documentsUrl}/${document.id}`)
+      .subscribe(
+        () => {
+          this.documents.splice(pos, 1);
+          this.sortAndSend();
+        },
+        (error) => {
+          console.error('Error deleting document:', error);
+        }
+      );
   }
 
-  // Sort Documents
+  // Sort documents and emit the updated list
   private sortAndSend() {
-    this.documents.sort((a, b) =>
-      a.name > b.name ? 1 : a.name < b.name ? -1 : 0
-    );
+    this.documents.sort((a, b) => a.name.localeCompare(b.name));
     this.documentListChangedEvent.next(this.documents.slice());
-  }
-
-  private getMaxId(): number {
-    let maxId = 0;
-    for (let doc of this.documents) {
-      const currentId = parseInt(doc.id, 10);
-      if (currentId > maxId) {
-        maxId = currentId;
-      }
-    }
-    return maxId;
   }
 }

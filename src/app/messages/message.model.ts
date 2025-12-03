@@ -3,19 +3,19 @@ export class Message {
   public subject: string;
   public msgText: string;
   public sender: string;
+  public _id?: string;
 
-  constructor(id: string, subject: string, msgText: string, sender: string) {
+  constructor(
+    id: string,
+    subject: string,
+    msgText: string,
+    sender: string,
+    _id?: string
+  ) {
     this.id = id;
     this.subject = subject;
     this.msgText = msgText;
     this.sender = sender;
+    this._id = _id;
   }
 }
-
-// id—the id of the message
-
-// subject—the subject of the message
-
-// msgText—the text of the message
-
-// sender—the sender of the message

@@ -10,76 +10,94 @@ export class MessageService {
   messages: Message[] = [];
   messageListChangedEvent = new Subject<Message[]>();
 
-  private maxMessageId: number = 0;
-  private firebaseUrl =
-    'https://sadiebybee-cms-default-rtdb.firebaseio.com/messages.json';
+  private messagesUrl = 'http://localhost:3000/messages';
 
   constructor(private http: HttpClient) {}
 
+  // GET all messages
   getMessages() {
-    this.http.get<Message[]>(this.firebaseUrl).subscribe(
-      (messages: Message[] | null) => {
-        this.messages = messages || [];
-        this.maxMessageId = this.getMaxId();
-        this.sortAndSend();
-      },
-      (error) => {
-        console.error('Error fetching messages from Firebase:', error);
-      }
-    );
-  }
-
-  storeMessages() {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     this.http
-      .put(this.firebaseUrl, this.messages, { headers })
-      .subscribe(() => {
-        this.sortAndSend();
-      });
+      .get<{ message: string; messages: Message[] }>(this.messagesUrl)
+      .subscribe(
+        (response) => {
+          this.messages = response.messages || [];
+          this.messageListChangedEvent.next(this.messages.slice());
+        },
+        (error) => {
+          console.error('Error fetching messages:', error);
+        }
+      );
   }
 
+  // GET a single message by id
   getMessage(id: string): Message | null {
     return this.messages.find((m) => m.id === id) || null;
   }
 
+  // POST a new message
   addMessage(newMessage: Message) {
     if (!newMessage) return;
-    this.maxMessageId++;
-    newMessage.id = this.maxMessageId.toString();
-    this.messages.push(newMessage);
-    this.storeMessages();
+    newMessage.id = ''; // server assigns id
+
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    this.http
+      .post<{ message: string; messageObject: Message }>(
+        this.messagesUrl,
+        newMessage,
+        { headers }
+      )
+      .subscribe(
+        (response) => {
+          this.messages.push(response.messageObject); // use messageObject
+          this.messageListChangedEvent.next(this.messages.slice());
+        },
+        (error) => {
+          console.error('Error adding message:', error);
+        }
+      );
   }
 
+  // PUT: update an existing message
   updateMessage(originalMessage: Message, newMessage: Message) {
     if (!originalMessage || !newMessage) return;
-    const pos = this.messages.indexOf(originalMessage);
+
+    const pos = this.messages.findIndex((m) => m.id === originalMessage.id);
     if (pos < 0) return;
+
     newMessage.id = originalMessage.id;
-    this.messages[pos] = newMessage;
-    this.storeMessages();
+    newMessage._id = (originalMessage as any)._id;
+
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    this.http
+      .put(`${this.messagesUrl}/${originalMessage.id}`, newMessage, { headers })
+      .subscribe(
+        () => {
+          this.messages[pos] = newMessage;
+          this.messageListChangedEvent.next(this.messages.slice());
+        },
+        (error) => {
+          console.error('Error updating message:', error);
+        }
+      );
   }
 
-  deleteMessage(message: Message) {
+  // DELETE a message
+  deleteMessage(message: Message | null) {
     if (!message) return;
-    const pos = this.messages.indexOf(message);
+
+    const pos = this.messages.findIndex((m) => m.id === message.id);
     if (pos < 0) return;
-    this.messages.splice(pos, 1);
-    this.storeMessages();
-  }
 
-  private sortAndSend() {
-    this.messages.sort((a, b) =>
-      a.subject > b.subject ? 1 : a.subject < b.subject ? -1 : 0
+    this.http.delete(`${this.messagesUrl}/${message.id}`).subscribe(
+      () => {
+        this.messages.splice(pos, 1);
+        this.messageListChangedEvent.next(this.messages.slice());
+      },
+      (error) => {
+        console.error('Error deleting message:', error);
+      }
     );
-    this.messageListChangedEvent.next(this.messages.slice());
-  }
-
-  private getMaxId(): number {
-    let maxId = 0;
-    for (let msg of this.messages) {
-      const currentId = parseInt(msg.id, 10);
-      if (currentId > maxId) maxId = currentId;
-    }
-    return maxId;
   }
 }
